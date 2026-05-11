@@ -1,0 +1,72 @@
+# Created with `jupyter-book init --gh-pages` 🪄 💚
+# Ensure your GitHub Pages settings for this repository are set to deploy with **GitHub Actions**.
+
+name: Jupyter Book (via myst) GitHub Pages Deploy
+on:
+  push:
+    branches: [main]
+
+env:
+  # Site will be served at https://unfmontreal.github.io/en
+  BASE_URL: /en/
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Jupyter Book (via myst)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install jupyter-book
+      - name: Build HTML Assets
+        run: jupyter-book build --html
+      - name: Inject per-page FR flag link
+        run: |
+          python3 << 'PYEOF'
+          import pathlib
+
+          JS = """<script>
+          document.addEventListener('DOMContentLoaded', function() {
+            var link = document.querySelector('a[href*="unfmontreal.github.io/fr"]');
+            if (link) {
+              var path = window.location.pathname.replace(/^\\/en/, '');
+              link.href = 'https://unfmontreal.github.io/fr' + path;
+            }
+          });
+          </script>"""
+
+          for f in pathlib.Path('_build/html').rglob('*.html'):
+              html = f.read_text(encoding='utf-8', errors='ignore')
+              if '</head>' in html:
+                  html = html.replace('</head>', JS + '\n</head>', 1)
+                  f.write_text(html, encoding='utf-8')
+          PYEOF
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './_build/html'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

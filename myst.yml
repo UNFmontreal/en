@@ -1,0 +1,61 @@
+# See docs at: https://mystmd.org/guide/frontmatter
+version: 1
+project:
+  title: "UNF Montreal"
+  description: "Functional Neuroimaging Unit — CRIUGM"
+  github: https://github.com/UNFmontreal/en
+  toc:
+    - file: intro.md
+    - title: About us
+      children:
+        - file: team.md
+        - file: contact.md
+        - file: about.md
+        - file: links.md
+    - title: Facilities
+      children:
+        - file: facility/access.md
+        - file: facility/MRI.md
+        - file: facility/simulation_room.md
+        - file: facility/testing_room.md
+        - file: facility/hardware_software.md
+        - file: facility/neurotheque.md
+    - title: Your MRI Study
+      children:
+        - title: Before your visit
+          children:
+            - file: your_study/before_visit/ethic.md
+            - file: your_study/before_visit/account.md
+            - file: your_study/before_visit/safety_guidelines.md
+            - file: your_study/before_visit/reservations.md
+        - title: MRI Setup
+          children:
+            - file: your_study/setup_mri/parameters.md
+            - file: your_study/setup_mri/stimuli.md
+        - file: your_study/visit.md
+        - title: Emergencies
+          children:
+            - file: your_study/urgency/fire.md
+            - file: your_study/urgency/quench.md
+            - file: your_study/urgency/medical.md
+            - file: your_study/urgency/codes.md
+        - title: After your visit
+          children:
+            - file: your_study/after_visit/finding.md
+            - file: your_study/after_visit/damage.md
+            - file: your_data/download_data.md
+    - title: Documents & Rates
+      children:
+        - file: documents/screening.md
+        - file: documents/screening_staff.md
+        - file: documents/logos.md
+        - file: documents/rate.md
+site:
+  template: book-theme
+  actions:
+    - title: "🇫🇷 FR"
+      url: "https://unfmontreal.github.io/fr/"
+  options:
+    logo: images/logo_unf.png
+    favicon: images/logo_unf.png
+    style: custom.css
