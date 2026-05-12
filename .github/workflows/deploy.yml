@@ -45,23 +45,21 @@ jobs:
       - name: Inject per-page FR flag link
         run: |
           python3 << 'PYEOF'
-          import pathlib
+          import pathlib, re
 
-          JS = """<script>
-          document.addEventListener('DOMContentLoaded', function() {
-            var link = document.querySelector('a[href*="unfmontreal.github.io/fr"]');
-            if (link) {
-              var path = window.location.pathname.replace(/^\\/en/, '');
-              link.href = 'https://unfmontreal.github.io/fr' + path;
-            }
-          });
-          </script>"""
-
-          for f in pathlib.Path('_build/html').rglob('*.html'):
+          build = pathlib.Path('_build/html')
+          for f in build.rglob('*.html'):
               html = f.read_text(encoding='utf-8', errors='ignore')
-              if '</head>' in html:
-                  html = html.replace('</head>', JS + '\n</head>', 1)
-                  f.write_text(html, encoding='utf-8')
+              if 'unfmontreal.github.io/fr' not in html:
+                  continue
+              rel = f.relative_to(build)
+              fr_url = 'https://unfmontreal.github.io/fr/' + str(rel)
+              html = re.sub(
+                  r'href="https://unfmontreal\.github\.io/fr[^"]*"',
+                  f'href="{fr_url}"',
+                  html,
+              )
+              f.write_text(html, encoding='utf-8')
           PYEOF
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
